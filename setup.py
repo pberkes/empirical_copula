@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 
 setup(
@@ -11,4 +11,5 @@ setup(
     author_email='pietro.berkes@gmail.com',
     url='https://github.com/pberkes/empirical_copula',
     packages=['empirical_copula'],
+    install_requires=['numpy', 'pandas']
 )
