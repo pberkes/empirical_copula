@@ -2,6 +2,20 @@ import numpy as np
 
 
 def create_copula_axes(fig, pmf1, pmf2, grid_lw=1):
+    """
+    Function to create the axes for the copula plot
+    
+    Keyword arguments:
+    fig -- a matplotlib figure
+    pmf1 -- a pandas Series of the empirical marginal probabilities of the first variable
+    pmf2 -- a pandas Series of the empirical marginal probabilities of the second variable
+    grid_lw -- line width of the grid lines
+    
+    Returns:
+    ax -- a matplotlib Axes object
+    x_mesh -- a numpy array of the x coordinates of the grid
+    y_mesh -- a numpy array of the y coordinates of the grid
+    """
     cdf1 = pmf1.cumsum()
     labels1 = cdf1.index.tolist()
     values1 = [0.0] + cdf1.values.tolist()
