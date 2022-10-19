@@ -1,0 +1,17 @@
+name: Publish to PyPI.org
+on:
+  release:
+    types: [published]
+jobs:
+  pypi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: python3 -m pip install --upgrade build && python3 -m build # build the python package
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@5fb2f047e26679d7846a8370de1642ff160b9025
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }} # Token provided by pypi.org
