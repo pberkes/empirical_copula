@@ -6,21 +6,16 @@ from empirical_copula import (
     empirical_marginal_pmf,
     independent_pmf,
     joint_counts,
+    order_pmf,
 )
 
 
-def test_empirical_marginals_categorical():
+def test_empirical_marginals():
     samples = pd.Series(['A', 'B', 'A', 'F', 'B', 'B'])
     expected = pd.Series(data=[3.0/6.0, 2.0/6.0, 1.0/6.0], index=['B', 'A', 'F'])
-    pmf = empirical_marginal_pmf(samples, is_ordinal=False)
-    assert_series_equal(expected, pmf)
-
-
-def test_empirical_marginals_ordinal():
-    samples = pd.Series(['A', 'B', 'A', 'F', 'B', 'B'])
-    expected = pd.Series(data=[2.0/6.0, 3.0/6.0, 1.0/6.0], index=['A', 'B', 'F'])
-    pmf = empirical_marginal_pmf(samples, is_ordinal=True)
-    assert_series_equal(expected, pmf)
+    pmf = empirical_marginal_pmf(samples)
+    # Re-order according to pmf index to be order-agnostic
+    assert_series_equal(expected.loc[pmf.index], pmf)
 
 
 def test_joint_counts():
@@ -29,8 +24,6 @@ def test_joint_counts():
               [100, 200, 100, 100, 300, 300]],
         index=['v1', 'v2']
     ).T
-    order1 = ['B', 'A', 'F']
-    order2 = [100, 200, 300]
     expected = pd.DataFrame(
         index=['B', 'A', 'F'],
         columns=[100, 200, 300],
@@ -40,8 +33,9 @@ def test_joint_counts():
             [0, 0, 1],
         ]
     )
-    counts = joint_counts(samples, order1=order1, order2=order2)
-    assert_frame_equal(expected, counts, check_names=False)
+    counts = joint_counts(samples)
+    # Re-order according to counts indices to be order-agnostic
+    assert_frame_equal(expected.loc[counts.index, counts.columns], counts, check_names=False)
 
 
 def test_independent_pmf():
@@ -57,7 +51,8 @@ def test_independent_pmf():
         ]
     )
     pmf = independent_pmf(pmf1, pmf2)
-    assert_frame_equal(expected, pmf)
+    # Re-order according to `counts` indices to be order-agnostic
+    assert_frame_equal(expected.loc[pmf.index], pmf)
 
 
 def test_empirical_pmf():
@@ -67,8 +62,7 @@ def test_empirical_pmf():
         index=['v1', 'v2']
     ).T
 
-    pmf1, pmf2, empirical_pmf, others = empirical_joint_pmf_details(
-        samples, is_col1_ordinal=True, is_col2_ordinal=True)
+    pmf1, pmf2, empirical_pmf, others = empirical_joint_pmf_details(samples)
 
     n = float(samples.shape[0])
     expected_joint_freq = pd.DataFrame(
@@ -80,7 +74,9 @@ def test_empirical_pmf():
             [0.0/n, 1.0/n],
         ]
     )
-    assert_frame_equal(expected_joint_freq, others['joint_freq'])
+    # Re-order according to `joint_freq` indices to be order-agnostic
+    joint_freq = others['joint_freq']
+    assert_frame_equal(expected_joint_freq.loc[joint_freq.index, joint_freq.columns], joint_freq)
 
     expected_empirical_pmf = pd.DataFrame(
         index=['A', 'B', 'F'],
@@ -91,4 +87,24 @@ def test_empirical_pmf():
             [0.0, 1.0 * n  / (1 * 5)],
         ]
     )
-    assert_frame_equal(expected_empirical_pmf, empirical_pmf)
+    # Re-order according to `empirical_pmf` indices to be order-agnostic
+    assert_frame_equal(expected_empirical_pmf.loc[empirical_pmf.index, empirical_pmf.columns],
+                       empirical_pmf)
+
+
+def test_order_from_pmf():
+    pmf = pd.Series(data=[0.3, 0.4, 0.1], index=['A', 'B', 'C'])
+
+    # when ordinal
+    expected = ['A', 'B', 'C']
+    ordered_pmf = order_pmf(pmf, is_ordinal=True)
+    order = ordered_pmf.index.tolist()
+    assert order == expected
+    assert_series_equal(ordered_pmf, pmf.loc[order])
+
+    # when non-ordinal
+    expected = ['B', 'A', 'C']
+    ordered_pmf = order_pmf(pmf, is_ordinal=False)
+    order = ordered_pmf.index.tolist()
+    assert order == expected
+    assert_series_equal(ordered_pmf, pmf.loc[order])
