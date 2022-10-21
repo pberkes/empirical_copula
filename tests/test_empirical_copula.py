@@ -6,6 +6,7 @@ from empirical_copula import (
     empirical_marginal_pmf,
     independent_pmf,
     joint_counts,
+    order_from_pmf,
 )
 
 
@@ -92,3 +93,15 @@ def test_empirical_pmf():
         ]
     )
     assert_frame_equal(expected_empirical_pmf, empirical_pmf)
+
+
+def test_order_from_pmf():
+    pmf = pd.Series(data=[0.3, 0.4, 0.1], index=['A', 'B', 'C'])
+    # when ordinal
+    expected = ['A', 'B', 'C']
+    order = order_from_pmf(pmf, is_ordinal=True)
+    assert order == expected
+    # when non-ordinal
+    expected = ['B', 'A', 'C']
+    order = order_from_pmf(pmf, is_ordinal=False)
+    assert order == expected
