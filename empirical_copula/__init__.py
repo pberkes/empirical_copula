@@ -93,7 +93,7 @@ def empirical_joint_pmf(samples):
     return pmf1, pmf2, empirical_pmf
 
 
-def order_from_pmf(pmf, is_ordinal=False):
+def order_pmf(pmf, is_ordinal=False):
     """ Order the pmf depending on the kind of discrete variable it contains.
 
     An ordinal variable is ordered in ascending order of the values of the variable, a non-ordinal
@@ -108,13 +108,11 @@ def order_from_pmf(pmf, is_ordinal=False):
 
     Returns
     -------
-    order : list
-         The list of values of the discrete variable, ordered according to its ordinality.
-
+    ordered_pmf : Series
+         The pmf values for each value of a discrete variable, ordered according to its ordinality.
     """
     if is_ordinal:
         ordered_pmf = pmf.sort_index(ascending=True)
     else:
         ordered_pmf = pmf.sort_values(ascending=False)
-    order = ordered_pmf.index.tolist()
-    return order
+    return ordered_pmf
