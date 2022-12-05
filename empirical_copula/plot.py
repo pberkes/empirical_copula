@@ -1,3 +1,4 @@
+from matplotlib.colors import ListedColormap
 import numpy as np
 
 
@@ -90,3 +91,55 @@ def copula_pcolormesh(fig, pmf1, pmf2, data, grid_lw=2, **pcolormesh_kwargs):
     # Plot the copula data on a pcolormesh
     pcm = ax.pcolormesh(x_mesh, y_mesh, data, **pcolormesh_kwargs)
     return ax, pcm
+
+
+def significance_copula_pcolormesh(fig, pmf1, pmf2, significance, quantile_levels, grid_lw=2,
+                                   **pcolormesh_kwargs):
+    """ Create a copula plot from significance data.
+
+    The significance copula plot has a colormap specialized to display low- and high-tail
+    significance. It is displayed with a colorbar.
+
+    Parameters
+    ----------
+    fig : Figure
+        Matplotlib Figure object to plot on.
+    pmf1 : Series
+        The pmf values for each value of the first discrete variable.
+    pmf2 : Series
+        The pmf values for each value of the second discrete variable.
+    significance : DataFrame
+        A value to plot for each combination of the values of the x-axis variable (index) and of
+        the y-axis variable (columns). These values will usually be generated from the function
+        `significance_from_bootstrap`.
+    quantile_levels : list of floats
+        List of significance levels for the low and high tail. These values will usually be
+        generated from the function `significance_from_bootstrap`.
+    grid_lw : int
+        Line width of the grid lines. Default is 2.
+    **pcolormesh_kwargs : dict
+        Additional keyword arguments are passed on to `pcolormesh`.
+
+    Returns:
+    ax : Axes
+       Matplotlib Axes object
+    pcm : QuadMesh
+       Matplotlib object returned by `pcolormesh`.
+    """
+
+    n_levels = len(quantile_levels) // 2
+
+    # Create specialized discrete colormap
+    colors_neg = [[0.0, g, 1.0] for g in np.linspace(0, 1, n_levels)]
+    colors_pos = [[1.0, g, 0.0] for g in reversed(np.linspace(0, 1, n_levels))]
+    colors_levels = colors_neg + [[0.5,0.5,0.5]] + colors_pos
+    significance_cmap = ListedColormap(colors_levels)
+
+    ax, pcm = copula_pcolormesh(
+        fig, pmf1, pmf2, significance,
+        vmin=-n_levels-0.5, vmax=n_levels + 0.5, cmap=significance_cmap,
+        **pcolormesh_kwargs,
+    )
+    cbar = fig.colorbar(pcm, ax=ax)
+    cbar.ax.set_yticklabels(quantile_levels)
+    cbar.set_label('significance level', fontsize=15, rotation=270)
