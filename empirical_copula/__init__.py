@@ -4,29 +4,34 @@ import pandas as pd
 
 
 def empirical_marginal_pmf(samples):
-    """
-    Compute the empirical marginals of a series of discrete variables.
+    """ Compute the empirical marginal probability of a discrete variable.
 
-    Keyword arguments:
-    samples -- a pandas Series of discrete variables
-    is_ordinal -- if True, the samples are assumed to be ordered
+    Parameters
+    ----------
+    samples : Series
+        The observed values of a discrete variable.
 
-    Returns:
-    independent_pmf -- a pandas Series of the empirical marginal probabilities
+    Returns
+    -------
+    pmf : Series
+        Empirical marginal probability of each value of the discrete variable.
     """
     pmf = samples.value_counts(normalize=True)
     return pmf
 
 
 def joint_counts(samples):
-    """
-    DataFrame of counts of the joint distribution of two variables.
+    """ Compute the joint counts of two discrete variables.
 
-    Keyword arguments:
-    samples -- a pandas DataFrame with two columns
+    Parameters
+    ----------
+    samples : DataFrame of size (n, 2)
+        The observed values of two discrete variables (two columns).
 
-    Returns:
-    counts -- a DataFrame of counts of the joint distribution of the two variables
+    Returns
+    -------
+    counts : DataFrame
+        Counts for each combination of the values of the two variables.
     """
     index_label = samples.columns[0]
     columns_label = samples.columns[1]
@@ -38,15 +43,20 @@ def joint_counts(samples):
 
 
 def independent_pmf(pmf1, pmf2):
-    """
-    Independent dataframe
+    """ Joint probabilities of two variables, assuming they are independent.
 
-    Keyword arguments:
-    pmf1 -- a pandas Series of the empirical marginal probabilities of the first variable
-    pmf2 -- a pandas Series of the empirical marginal probabilities of the second variable
+    Parameters
+    ----------
+    pmf1 : Series
+        The pmf values for each value of the first discrete variable.
+    pmf2 : Series
+        The pmf values for each value of the second discrete variable.
 
-    Returns:
-    independent_pmf -- a pandas DataFrame of the independent probability mass function
+    Returns
+    -------
+    independent_pmf : DataFrame
+        Joint probability of each combination of values of the two variables, assuming they are
+        independent.
     """
     independent_pmf = pd.DataFrame(
         data=pmf1.values[:, None] * pmf2.values[None, :],
@@ -57,16 +67,29 @@ def independent_pmf(pmf1, pmf2):
 
 
 def empirical_joint_pmf_details(samples):
-    """ Compute the empirical joint pmf and return all the details about it.
+    """ Compute the empirical joint probability of two variable.
 
-    Keyword arguments:
-    samples -- a pandas DataFrame with two columns
+    This version of `empirical_joint_pmf` also returns a dictionary with intermediate results.
 
-    Returns:
-    pmf1 -- a pandas Series of the empirical marginal probabilities of the first column
-    pmf2 -- a pandas Series of the empirical marginal probabilities of the second column
-    empirical_pmf -- a pandas DataFrame of the empirical joint probability mass function
-    dict -- counts, joint_freqs, ind_pmf
+    Parameters
+    ----------
+    samples : DataFrame of size (n, 2)
+        The observed values of two discrete variables (two columns).
+
+    Returns
+    -------
+    pmf1 : Series
+        The pmf values for each value of the first discrete variable.
+    pmf2 : Series
+        The pmf values for each value of the second discrete variable.
+    empirical_pmf : DataFrame
+        Joint probability of each combination of values of the two variables.
+    others : dict
+        Dictionary containing intermediate results.
+        `'counts'`: Joint counts of each combination
+        `'joint_freq'`: Joint frequency of each combination
+        `'ind_pmf'`: Joint probability of each combination of values of the two variables,
+                     assuming they are independent.
     """
     pmf1 = empirical_marginal_pmf(samples.iloc[:, 0])
     pmf2 = empirical_marginal_pmf(samples.iloc[:, 1])
@@ -74,20 +97,27 @@ def empirical_joint_pmf_details(samples):
     joint_freq = counts / counts.sum().sum()
     ind_pmf = independent_pmf(pmf1, pmf2)
     empirical_pmf = joint_freq / ind_pmf
-    return pmf1, pmf2, empirical_pmf, {'counts': counts, 'joint_freq': joint_freq, 'ind_pmf': ind_pmf}
+
+    others = {'counts': counts, 'joint_freq': joint_freq, 'ind_pmf': ind_pmf}
+    return pmf1, pmf2, empirical_pmf, others
 
 
 def empirical_joint_pmf(samples):
-    """
-    empirical joint pmf function
+    """ Compute the empirical joint probability of two variable.
 
-    Keyword arguments:
-    samples -- a pandas DataFrame with two columns
+    Parameters
+    ----------
+    samples : DataFrame of size (n, 2)
+        The observed values of two discrete variables (two columns).
 
-    Returns:
-    pmf1 -- a pandas Series of the empirical marginal probabilities of the first variable
-    pmf2 -- a pandas Series of the empirical marginal probabilities of the second variable
-    empirical_pmf -- a pandas DataFrame of the empirical joint probability mass function
+    Returns
+    -------
+    pmf1 : Series
+        The pmf values for each value of the first discrete variable.
+    pmf2 : Series
+        The pmf values for each value of the second discrete variable.
+    empirical_pmf : DataFrame
+        Joint probability of each combination of values of the two variables.
     """
     pmf1, pmf2, empirical_pmf, _ = empirical_joint_pmf_details(samples)
     return pmf1, pmf2, empirical_pmf

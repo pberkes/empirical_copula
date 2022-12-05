@@ -3,8 +3,7 @@ import numpy as np
 
 
 def _create_copula_axes(fig, pmf1, pmf2, grid_lw):
-    """
-    Function to create the axes for the copula plot
+    """ Function to create the axes for the copula plot
 
     Keyword arguments:
     fig -- a matplotlib figure
