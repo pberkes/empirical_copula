@@ -3,18 +3,27 @@ import numpy as np
 
 
 def _create_copula_axes(fig, pmf1, pmf2, grid_lw):
-    """ Function to create the axes for the copula plot
+    """ Function to create the axes for the copula plot.
 
-    Keyword arguments:
-    fig -- a matplotlib figure
-    pmf1 -- a pandas Series of the empirical marginal probabilities of the first variable
-    pmf2 -- a pandas Series of the empirical marginal probabilities of the second variable
-    grid_lw -- line width of the grid lines
+    Parameters
+    ----------
+    fig : Figure
+        Matplotlib Figure object to plot on.
+    pmf1 : Series
+        The pmf values for each value of the first discrete variable.
+    pmf2 : Series
+        The pmf values for each value of the second discrete variable.
+    grid_lw : int
+        Line width of the grid lines. Default is 2.
 
-    Returns:
-    ax -- a matplotlib Axes object
-    x_mesh -- a numpy array of the x coordinates of the grid
-    y_mesh -- a numpy array of the y coordinates of the grid
+    Returns
+    -------
+    ax : Axes
+        Matplotlib Axes object
+    x_mesh : array
+        The x coordinates of the grid
+    x_mesh : array
+        The y coordinates of the grid
     """
     cdf1 = pmf1.cumsum()
     labels1 = cdf1.index.tolist()
@@ -76,7 +85,8 @@ def copula_pcolormesh(fig, pmf1, pmf2, data, grid_lw=2, **pcolormesh_kwargs):
     **pcolormesh_kwargs : dict
         Additional keyword arguments are passed on to `pcolormesh`.
 
-    Returns:
+    Returns
+    -------
     ax : Axes
        Matplotlib Axes object
     pcm : QuadMesh
@@ -119,7 +129,8 @@ def significance_copula_pcolormesh(fig, pmf1, pmf2, significance, quantile_level
     **pcolormesh_kwargs : dict
         Additional keyword arguments are passed on to `pcolormesh`.
 
-    Returns:
+    Returns
+    -------
     ax : Axes
        Matplotlib Axes object
     pcm : QuadMesh
