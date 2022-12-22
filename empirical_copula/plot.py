@@ -151,5 +151,8 @@ def significance_copula_pcolormesh(fig, pmf1, pmf2, significance, quantile_level
         **pcolormesh_kwargs,
     )
     cbar = fig.colorbar(pcm, ax=ax)
+    cbar.ax.set_yticks(np.arange(-n_levels, n_levels+1))
     cbar.ax.set_yticklabels(quantile_levels)
     cbar.set_label('significance level', fontsize=15, rotation=270)
+
+    return significance_cmap
