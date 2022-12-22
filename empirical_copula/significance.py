@@ -31,12 +31,13 @@ def _bootstrap_independently(samples, n_bootstraps, random_state=np.random):
         bootstrap resampling.
 
     """
+    col1, col2 = samples.columns
     bootstrap_counts = []
     for _ in range(n_bootstraps):
         bootstrap_samples = pd.DataFrame(
             data={
-                'v1': random_state.choice(samples['v1'], size=samples.shape[0], replace=True),
-                'v2': random_state.choice(samples['v2'], size=samples.shape[0], replace=True),
+                col1: random_state.choice(samples[col1], size=samples.shape[0], replace=True),
+                col2: random_state.choice(samples[col2], size=samples.shape[0], replace=True),
             }
         )
         counts = joint_counts(bootstrap_samples)

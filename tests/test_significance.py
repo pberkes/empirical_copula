@@ -8,7 +8,7 @@ def test__bootstrap_independently():
     samples = pd.DataFrame(
         data=[['A', 'A', 'B', 'B', 'B'],
               [100, 200, 100, 300, 500]],
-        index=['v1', 'v2']
+        index=['a', 'b']
     ).T
 
     random_state = np.random.RandomState(98)
@@ -30,7 +30,7 @@ def test_significance_from_bootstrap():
     samples = pd.DataFrame(
         data=[['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'C', 'C'],
               [100, 100, 100, 100, 200, 300, 200, 300, 200, 300, 200, 300]],
-        index=['v1', 'v2']
+        index=['c', 'd']
     ).T
 
     random_state = np.random.RandomState(98)
