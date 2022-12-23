@@ -56,8 +56,7 @@ distribution and derive a significance level.
 ## Examples
 
 To learn how to use `emipirical_copula`, it's easiest to look at the examples notebook in the
-git repository: [GitHub examples notebooks](https://github.
-com/pberkes/empirical_copula/tree/main/examples)
+git repository: [GitHub examples notebooks](https://github.com/pberkes/empirical_copula/tree/main/examples)
 
 ## References
 
