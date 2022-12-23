@@ -2,10 +2,12 @@
 
 from setuptools import setup
 
+from empirical_copula import __version__
+
 
 setup(
     name='empirical_copula',
-    version='0.1',
+    version=str(__version__),
     description='Empirical copulas for discrete variables',
     author='Pietro Berkes',
     author_email='pietro.berkes@gmail.com',
