@@ -2,7 +2,7 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 
 
-def _create_copula_axes(fig, pmf1, pmf2, grid_lw):
+def _create_copula_axes(fig, pmf1, pmf2, grid_lw, annotation_fontsize=15):
     """ Function to create the axes for the copula plot.
 
     Parameters
@@ -15,6 +15,8 @@ def _create_copula_axes(fig, pmf1, pmf2, grid_lw):
         The pmf values for each value of the second discrete variable.
     grid_lw : int
         Line width of the grid lines. Default is 2.
+    annotation_fontsize : int
+        Font size of the category annotation next to the axis.
 
     Returns
     -------
@@ -44,8 +46,8 @@ def _create_copula_axes(fig, pmf1, pmf2, grid_lw):
         ax.axvline(x, color='k', lw=grid_lw)
     trans = ax.get_xaxis_transform()  # x in data units, y in axes fraction
     for x0, x1, label in zip(xticks[:-1], xticks[1:], labels1):
-        ax.annotate(label, xy=((x0 + x1) / 2, -0.15), xycoords=trans, fontsize=15,
-                    horizontalalignment='center')
+        ax.annotate(label, xy=((x0 + x1) / 2, -0.15), xycoords=trans, fontsize=annotation_fontsize,
+                    verticalalignment='top', horizontalalignment='center')
 
     yticks = values2
     yticks_labels = [f'{t:.02f}' for t in yticks]
@@ -55,14 +57,15 @@ def _create_copula_axes(fig, pmf1, pmf2, grid_lw):
         ax.axhline(y, color='k', lw=grid_lw)
     trans = ax.get_yaxis_transform()  # y in data units, x in axes fraction
     for y0, y1, label in zip(yticks[:-1], yticks[1:], labels2):
-        ax.annotate(label, xy=(-0.15, (y0 + y1) / 2), xycoords=trans, fontsize=15,
-                    verticalalignment='center')
+        ax.annotate(label, xy=(-0.15, (y0 + y1) / 2), xycoords=trans, fontsize=annotation_fontsize,
+                    verticalalignment='center', horizontalalignment='right')
 
     y_mesh, x_mesh = np.meshgrid(values2, values1)
     return ax, x_mesh, y_mesh
 
 
-def copula_pcolormesh(fig, pmf1, pmf2, data, grid_lw=2, **pcolormesh_kwargs):
+def copula_pcolormesh(fig, pmf1, pmf2, data, grid_lw=2,
+                      annotation_fontsize=15, **pcolormesh_kwargs):
     """ Create a copula plot.
 
     The values in `data` are re-ordered according to the ordering of the indices of `pmf1` and
@@ -81,6 +84,8 @@ def copula_pcolormesh(fig, pmf1, pmf2, data, grid_lw=2, **pcolormesh_kwargs):
         the y-axis variable (columns)
     grid_lw : int
         Line width of the grid lines. Default is 2.
+    annotation_fontsize : int
+        Font size of the category annotation next to the axis.
 
     **pcolormesh_kwargs : dict
         Additional keyword arguments are passed on to `pcolormesh`.
@@ -96,14 +101,15 @@ def copula_pcolormesh(fig, pmf1, pmf2, data, grid_lw=2, **pcolormesh_kwargs):
     # Re-order data to match pmf1, pmf2
     data = data.loc[pmf1.index, pmf2.index]
     # Create axes for the copula plot
-    ax, x_mesh, y_mesh = _create_copula_axes(fig, pmf1, pmf2, grid_lw=grid_lw)
+    ax, x_mesh, y_mesh = _create_copula_axes(fig, pmf1, pmf2, grid_lw=grid_lw,
+                                             annotation_fontsize=annotation_fontsize)
     # Plot the copula data on a pcolormesh
     pcm = ax.pcolormesh(x_mesh, y_mesh, data, **pcolormesh_kwargs)
     return ax, pcm
 
 
 def significance_copula_pcolormesh(fig, pmf1, pmf2, significance, quantile_levels, grid_lw=2,
-                                   **pcolormesh_kwargs):
+                                   annotation_fontsize=15, **pcolormesh_kwargs):
     """ Create a copula plot from significance data.
 
     The significance copula plot has a colormap specialized to display low- and high-tail
@@ -126,6 +132,8 @@ def significance_copula_pcolormesh(fig, pmf1, pmf2, significance, quantile_level
         generated from the function `significance_from_bootstrap`.
     grid_lw : int
         Line width of the grid lines. Default is 2.
+    annotation_fontsize : int
+        Font size of the category annotation next to the axis.
     **pcolormesh_kwargs : dict
         Additional keyword arguments are passed on to `pcolormesh`.
 
@@ -147,8 +155,8 @@ def significance_copula_pcolormesh(fig, pmf1, pmf2, significance, quantile_level
 
     ax, pcm = copula_pcolormesh(
         fig, pmf1, pmf2, significance,
-        vmin=-n_levels-0.5, vmax=n_levels + 0.5, cmap=significance_cmap,
-        **pcolormesh_kwargs,
+        vmin=-n_levels-0.5, vmax=n_levels + 0.5, cmap=significance_cmap, grid_lw=grid_lw,
+        annotation_fontsize=annotation_fontsize, **pcolormesh_kwargs,
     )
     cbar = fig.colorbar(pcm, ax=ax)
     cbar.ax.set_yticks(np.arange(-n_levels, n_levels+1))
