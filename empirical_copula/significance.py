@@ -89,11 +89,21 @@ def significance_from_bootstrap(samples, n_bootstraps, p_levels_low, random_stat
 
     samples_counts = joint_counts(samples)
     significance = np.zeros_like(samples_counts)
-    for v, q in zip(quantile_levels_labels, quantile_levels):
-        if v > 0:
-            significance[samples_counts >= bootstrap_quantiles.loc[q]] = v
-        elif v < 0:
-            significance[samples_counts <= bootstrap_quantiles.loc[q]] = v
-    significance = pd.DataFrame(data=significance, index=samples_counts.index, columns=samples_counts.columns)
+    # More frequent than uniform
+    quantile_levels_high = p_levels_high
+    quantile_levels_labels_high = [i+1 for i in range(n_levels)]
+    for v, q in zip(quantile_levels_labels_high, quantile_levels_high):
+        significance[samples_counts >= bootstrap_quantiles.loc[q]] = v
+
+    # Less frequent than uniform
+    quantile_levels_low = p_levels_low[::-1]
+    quantile_levels_labels_low = [-(i+1) for i in range(n_levels)]
+    for v, q in zip(quantile_levels_labels_low, quantile_levels_low):
+        significance[samples_counts <= bootstrap_quantiles.loc[q]] = v
+    significance = pd.DataFrame(
+        data=significance,
+        index=samples_counts.index,
+        columns=samples_counts.columns
+    )
 
     return quantile_levels, quantile_levels_labels, significance

@@ -41,3 +41,22 @@ def test_significance_from_bootstrap():
     assert quantile_levels_labels == [-2, -1, 0, 1, 2]
     assert significance.loc['A', 100] == 2
     assert (significance.loc['B':'C', 200:300] == 0).all().all()
+
+
+def test_low_significance_from_bootstrap():
+    # Marginal distributions are uniform
+    # 'A' and 100 are very dependent (they always appear together)
+    # 'A', 'B' are independent of 200, 300 (they appear equally often together)
+    samples = pd.DataFrame(
+        data=[['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B'],
+              [100, 100, 200, 200, 100, 200, 300, 100, 200, 300]],
+        index=['c', 'd']
+    ).T
+
+    random_state = np.random.RandomState(98)
+    quantile_levels, quantile_levels_labels, significance = significance_from_bootstrap(
+        samples, n_bootstraps=100, p_levels_low=[0.01, 0.1], random_state=random_state)
+
+    assert quantile_levels == [0.01, 0.1, 0, 0.9, 0.99]
+    assert quantile_levels_labels == [-2, -1, 0, 1, 2]
+    assert significance.loc['A', 300] == -2
